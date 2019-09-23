@@ -1,0 +1,112 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+version '1.08'
+
+sourceCompatibility = 1.8
+
+task schemaGenerator(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'SchemaGenerator',
+                'Implementation-Version': version,
+                'Main-Class': 'Schema'
+    }
+    archivesBaseName = "schemaGenerator"
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task ontopMappingGenerator(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'MappingGenerator',
+                'Implementation-Version': version,
+                'Main-Class': 'Mappings'
+    }
+    archivesBaseName = "ontopMappingGenerator"
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task owlGenerator(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'OwlGenerator',
+                'Implementation-Version': version,
+                'Main-Class': 'Owls'
+    }
+    archivesBaseName = "owlGenerator"
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task modifyChaseBench(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'ModifyCB',
+                'Implementation-Version': version,
+                'Main-Class': 'ModifyChaseBench'
+    }
+    archivesBaseName = "modifyChaseBench"
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task datalogToUCQ(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'DataLogToCB',
+                'Implementation-Version': version,
+                'Main-Class': 'DataLogToUCQ'
+    }
+    archivesBaseName = "datalogToCB"
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task sqlConv(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'SQLConverter',
+                'Implementation-Version': version,
+                'Main-Class': 'SQLConverter'
+    }
+    archivesBaseName = "sqlConvert"
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task singleStep(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'SingleStep',
+                'Implementation-Version': version,
+                'Main-Class': 'SingleStep'
+    }
+    archivesBaseName = "singleStep"
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task deepData(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'DeepData',
+                'Implementation-Version': version,
+                'Main-Class': 'DeepData'
+    }
+    archivesBaseName = "deepData"
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'junit', name: 'junit', version: '4.12'
+    // https://mvnrepository.com/artifact/com.google.inject/guice
+    compile group: 'com.google.inject', name: 'guice', version: '1.0'
+    compile 'net.sourceforge.owlapi:owlapi-distribution:5.1.0'
+    // https://mvnrepository.com/artifact/postgresql/postgresql
+    compile group: 'postgresql', name: 'postgresql', version: '9.0-801.jdbc4'
+
+
+}
