@@ -22,9 +22,7 @@ public class SQLConverter {
     }
 
     public static void main(String[] args) throws Exception {
-        //System.out.println(manyQueriestoSQL(DataLogToUCQ.getRuleString(args[0]),args.length > 1));
-        System.out.println(DataLogToUCQ.getRuleString(args[0]).get(0).getHeadAtom(0));
-        System.out.println(addAliases(manyQueriestoSQL(DataLogToUCQ.getRuleString(args[0]), args.length > 1)));
+        System.out.println(manyQueriestoSQL(DataLogToUCQ.getRuleString(args[0]),args.length > 1));
     }
 
     public static String addAliases(String originalQuery) {
@@ -42,45 +40,43 @@ public class SQLConverter {
     }
 
     public static String queryToSQL(Rule query, boolean src) {
+        char aliasLetter= 'A';
         List<Variable> distVars = new ArrayList<>();
         Map<Variable, ArrayList<String>> columnMappings = new HashMap<Variable, ArrayList<String>>();
         Map<Constant, ArrayList<String>> columnConstraints = new HashMap<Constant, ArrayList<String>>();
         List<String> predicates = new ArrayList<>();
-
         Arrays.stream(query.getHeadAtoms()).forEach(atom -> Arrays.stream(atom.getArguments()).filter(term -> term instanceof Variable).forEach(term -> distVars.add((Variable) term)));
 
         for (Atom a : query.getBodyAtoms()) {
             predicates.add(a.getPredicate().getName());
             for (int i = 0; i < a.getNumberOfArguments(); i++) {
-                String predName = a.getPredicate().getName();
-                if (src)
-                    predName = "src_" + predName;
                 if (a.getArgument(i) instanceof Variable) {
                     Variable var = (Variable) a.getArgument(i);
                     if (columnMappings.containsKey(var)) {
                         ArrayList<String> columns = columnMappings.get(var);
-                        columns.add("\"" + predName + "\".\"c" + i + "\"");
+                        columns.add(aliasLetter +".\"c" + i + "\"");
                         columnMappings.put(var, columns);
                     } else {
                         ArrayList<String> columns = new ArrayList<String>();
-                        columns.add("\"" + predName + "\".\"c" + i + "\"");
+                        columns.add(aliasLetter +".\"c" + i + "\"");
                         columnMappings.put(var, columns);
                     }
                 } else if (a.getArgument(i) instanceof Constant) {
                     Constant con = (Constant) a.getArgument(i);
                     if (columnConstraints.containsKey(con)) {
                         ArrayList<String> columns = columnConstraints.get(con);
-                        columns.add("\"" + predName + "\".\"c" + i + "\"");
+                        columns.add(aliasLetter +".\"c" + i + "\"");
                         columnConstraints.put(con, columns);
                     } else {
                         ArrayList<String> columns = new ArrayList<String>();
-                        columns.add("\"" + predName + "\".\"c" + i + "\"");
+                        columns.add(aliasLetter+".\"c" + i + "\"");
                         columnConstraints.put(con, columns);
                     }
                 }
             }
+            aliasLetter++;
         }
-
+        aliasLetter='A';
         StringBuilder builder = new StringBuilder();
         builder.append("SELECT DISTINCT ");
         String prefix = "";
@@ -99,6 +95,7 @@ public class SQLConverter {
             if (src)
                 builder.append("src_");
             builder.append(s).append("\"");
+            builder.append(" as ").append(aliasLetter++);
             prefix = ", ";
         }
         if (equalities(columnMappings, columnConstraints))
@@ -118,9 +115,9 @@ public class SQLConverter {
 
         for (Constant c : columnConstraints.keySet()) {
             ArrayList<String> columns = columnConstraints.get(c);
-            for (int i = 0; i < columns.size(); i++) {
+            for (String column : columns) {
                 builder.append(prefix);
-                builder.append(columns.get(i)).append(" = ").append(c.toString().replace("?", ""));
+                builder.append(column).append(" = ").append(c.toString().replace("?", ""));
             }
         }
 
