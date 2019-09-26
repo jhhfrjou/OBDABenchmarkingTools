@@ -22,7 +22,7 @@ public class SQLConverter {
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println(manyQueriestoSQL(DataLogToUCQ.getRuleString(args[0]),args.length > 1));
+        System.out.println(manyQueriestoSQL(DataLogToUCQ.getRuleString(args[0]), args.length > 1));
     }
 
     public static String addAliases(String originalQuery) {
@@ -39,8 +39,8 @@ public class SQLConverter {
         return output.toString();
     }
 
-    public static String queryToSQL(Rule query, boolean src) {
-        char aliasLetter= 'A';
+    public static String queryToSQL(Rule query, boolean src, boolean existentialRemove) {
+        char aliasLetter = 'A';
         List<Variable> distVars = new ArrayList<>();
         Map<Variable, ArrayList<String>> columnMappings = new HashMap<Variable, ArrayList<String>>();
         Map<Constant, ArrayList<String>> columnConstraints = new HashMap<Constant, ArrayList<String>>();
@@ -54,29 +54,29 @@ public class SQLConverter {
                     Variable var = (Variable) a.getArgument(i);
                     if (columnMappings.containsKey(var)) {
                         ArrayList<String> columns = columnMappings.get(var);
-                        columns.add(aliasLetter +".\"c" + i + "\"");
+                        columns.add(aliasLetter + ".\"c" + i + "\"");
                         columnMappings.put(var, columns);
                     } else {
                         ArrayList<String> columns = new ArrayList<String>();
-                        columns.add(aliasLetter +".\"c" + i + "\"");
+                        columns.add(aliasLetter + ".\"c" + i + "\"");
                         columnMappings.put(var, columns);
                     }
                 } else if (a.getArgument(i) instanceof Constant) {
                     Constant con = (Constant) a.getArgument(i);
                     if (columnConstraints.containsKey(con)) {
                         ArrayList<String> columns = columnConstraints.get(con);
-                        columns.add(aliasLetter +".\"c" + i + "\"");
+                        columns.add(aliasLetter + ".\"c" + i + "\"");
                         columnConstraints.put(con, columns);
                     } else {
                         ArrayList<String> columns = new ArrayList<String>();
-                        columns.add(aliasLetter+".\"c" + i + "\"");
+                        columns.add(aliasLetter + ".\"c" + i + "\"");
                         columnConstraints.put(con, columns);
                     }
                 }
             }
             aliasLetter++;
         }
-        aliasLetter='A';
+        aliasLetter = 'A';
         StringBuilder builder = new StringBuilder();
         builder.append("SELECT DISTINCT ");
         String prefix = "";
@@ -98,10 +98,20 @@ public class SQLConverter {
             builder.append(" as ").append(aliasLetter++);
             prefix = ", ";
         }
-        if (equalities(columnMappings, columnConstraints))
+        if (equalities(columnMappings, columnConstraints) || existentialRemove)
             builder.append(" WHERE ");
 
-        prefix = "";
+        if (existentialRemove) {
+            prefix = "";
+            for (Variable v : distVars) {
+                if (columnMappings.containsKey(v)) {
+                    builder.append(prefix);
+                    builder.append(columnMappings.get(v).get(0));
+                    builder.append(" NOT LIKE '_:%'");
+                    prefix = " AND ";
+                }
+            }
+        }
         for (Variable v : columnMappings.keySet()) {
             ArrayList<String> columns = columnMappings.get(v);
             if (columns.size() > 1) {
@@ -123,7 +133,10 @@ public class SQLConverter {
 
         builder.append(";");
         return builder.toString().replace("?", "");
+    }
 
+    public static String queryToSQL(Rule query, boolean src) {
+        return queryToSQL(query, src, false);
     }
 
     private static boolean equalities(Map<Variable, ArrayList<String>> columnMappings, Map<Constant, ArrayList<String>> columnConstraints) {

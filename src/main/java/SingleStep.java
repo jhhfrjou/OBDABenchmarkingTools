@@ -103,7 +103,7 @@ public class SingleStep {
                 //And query
                 Rule query = Mappings.getRules(queryLoc).get(0);
                 //Create the final sql query
-                String sqlQuery = "SELECT COUNT(*) FROM (" + SQLConverter.queryToSQL(query, false).replace(";", "") + ") AS query;";
+                String sqlQuery = "SELECT COUNT(*) FROM (" + SQLConverter.queryToSQL(query, false,true).replace(";", "") + ") AS query;";
                 System.out.println(sqlQuery);
                 List<Atom> queryAtoms = Arrays.asList(query.getBodyAtoms());
                 //Filter out the schema only for atoms in the query
