@@ -73,13 +73,13 @@ task sqlConv(type: Jar) {
     with jar
 }
 
-task singleStep(type: Jar) {
+task stChase(type: Jar) {
     manifest {
-        attributes 'Implementation-Title': 'SingleStep',
+        attributes 'Implementation-Title': 'StChase',
                 'Implementation-Version': version,
-                'Main-Class': 'SingleStep'
+                'Main-Class': 'StChase'
     }
-    archivesBaseName = "singleStep"
+    archivesBaseName = "stChase"
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }

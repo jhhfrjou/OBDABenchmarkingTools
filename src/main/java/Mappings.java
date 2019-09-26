@@ -17,7 +17,7 @@ public class Mappings {
         if (args.length == 0) {
             System.out.println("Supported options:");
             System.out.println("-st-tgds    <file>  | the file containing the source-to-target TGDs");
-            System.out.println("-out        <file>  | the file containing the query");
+            System.out.println("-out        <file>  | the output file location");
         } else {
             String sttgds = null;
             String outLoc = null;
@@ -83,7 +83,7 @@ public class Mappings {
         return originalString.toString().split("#")[1].split(">")[0];
     }
 
-    public static List<Rule> getRules(String file) throws Exception {
+    static List<Rule> getRules(String file) throws Exception {
         List<Rule> cbRules = new ArrayList<>();
         InputStream resourceStream = new FileInputStream(file);
         Reader input = new InputStreamReader(resourceStream);

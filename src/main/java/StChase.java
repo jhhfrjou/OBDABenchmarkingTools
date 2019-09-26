@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.sql.*;
 
-public class SingleStep {
+public class StChase {
 
     private static Connection c;
 
@@ -302,20 +302,18 @@ public class SingleStep {
         for(Atom atom : queryAtoms) {
             map.put(atom, new ConcurrentLinkedQueue<>());
         }
-        ruleStream.forEach(rule -> {
-            atoms.parallelStream()
-                    .filter(atom -> atom.getPredicate().equals(rule.getBodyAtom(0).getPredicate()))
-                    .map(atom -> IntStream.range(0, atom.getNumberOfArguments()).boxed().collect(
-                            Collectors.toMap(j -> (Variable) (rule.getBodyAtom(0).getArgument(j)), j -> atom.getArguments()[j])))
-                    .forEach(substitution -> {
-                        getExistential(rule, substitution, queryAtoms);
-                        for (Atom atom : rule.applySubstitution(substitution).getHeadAtoms()) {
-                            ConcurrentLinkedQueue<Term[]> termsMap;
-                            termsMap = map.get(atom);
-                            termsMap.add(atom.getArguments());
-                        }
-                    });
-        });
+        ruleStream.forEach(rule -> atoms.parallelStream()
+                .filter(atom -> atom.getPredicate().equals(rule.getBodyAtom(0).getPredicate()))
+                .map(atom -> IntStream.range(0, atom.getNumberOfArguments()).boxed().collect(
+                        Collectors.toMap(j -> (Variable) (rule.getBodyAtom(0).getArgument(j)), j -> atom.getArguments()[j])))
+                .forEach(substitution -> {
+                    getExistential(rule, substitution, queryAtoms);
+                    for (Atom atom : rule.applySubstitution(substitution).getHeadAtoms()) {
+                        ConcurrentLinkedQueue<Term[]> termsMap;
+                        termsMap = map.get(atom);
+                        termsMap.add(atom.getArguments());
+                    }
+                }));
         System.out.println("Applying substitutions : " + (System.currentTimeMillis() - start) + "ms");
     }
 

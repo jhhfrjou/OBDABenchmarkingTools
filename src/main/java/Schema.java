@@ -8,8 +8,8 @@ public class Schema {
 
         if (args.length == 0) {
             System.out.println("Supported options:");
-            System.out.println("-st-tgd       <file>   | the file containing the source-to-target TGDs");
-            System.out.println("-t-tgd        <file>   | the file containing the target-to-target TGDs");
+            System.out.println("-st-tgds       <file>   | the file containing the source-to-target TGDs");
+            System.out.println("-t-tgds        <file>   | the file containing the target-to-target TGDs");
             System.out.println("-s-schema     <file>   | the output file of the source schema");
             System.out.println("-t-schema     <file>   | the output file of the target schema");
         } else {
@@ -71,7 +71,7 @@ public class Schema {
     }
 
     //Can be much shorter but is good to check the arity is still correct
-    static void getAtoms(Rule rule, List<Atom> atoms) {
+    private static void getAtoms(Rule rule, List<Atom> atoms) {
         for (Atom atom : rule.getHeadAtoms()) {
             if (atoms.indexOf(atom) >= 0) {
                 Atom already = atoms.get(atoms.indexOf(atom));
@@ -103,7 +103,7 @@ public class Schema {
     }
 
     //Creates schema objects from each atom of the list and adds it to teh schema
-    public static void generateSchema(DatabaseSchema schema, Atom atom, boolean target) {
+    private static void generateSchema(DatabaseSchema schema, Atom atom, boolean target) {
         if (!schema.getPredicates().contains(atom.getPredicate())) {
             String[] colName = new String[atom.getNumberOfArguments()];
             Domain[] doms = new Domain[atom.getNumberOfArguments()];
