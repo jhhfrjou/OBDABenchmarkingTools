@@ -148,7 +148,7 @@ public class SingleStep {
     }
 
 
-    //Applies terms to a prepared statemetn
+    //Applies terms to a prepared statement
     private static void applyTerms(Atom atom, PreparedStatement pst) throws SQLException {
         for (int i = 0; i < atom.getArguments().length; i++) {
             Term term = atom.getArgument(i);
@@ -299,7 +299,9 @@ public class SingleStep {
     //Everything is concurrent properties as I tried to parallelise it all as much as i can
     private static void applySubstitution(ConcurrentLinkedQueue<Atom> atoms, Stream<Rule> ruleStream, List<Atom> queryAtoms, ConcurrentHashMap<Atom, ConcurrentLinkedQueue<Term[]>> map) {
         long start = System.currentTimeMillis();
-        ConcurrentLinkedQueue<Rule> subbed = new ConcurrentLinkedQueue<>();
+        for(Atom atom : queryAtoms) {
+            map.put(atom, new ConcurrentLinkedQueue<>());
+        }
         ruleStream.forEach(rule -> {
             atoms.parallelStream()
                     .filter(atom -> atom.getPredicate().equals(rule.getBodyAtom(0).getPredicate()))
@@ -309,12 +311,7 @@ public class SingleStep {
                         getExistential(rule, substitution, queryAtoms);
                         for (Atom atom : rule.applySubstitution(substitution).getHeadAtoms()) {
                             ConcurrentLinkedQueue<Term[]> termsMap;
-                            if (map.containsKey(atom)) {
-                                termsMap = map.get(atom);
-                            } else {
-                                termsMap = new ConcurrentLinkedQueue<>();
-                                map.put(atom, termsMap);
-                            }
+                            termsMap = map.get(atom);
                             termsMap.add(atom.getArguments());
                         }
                     });
