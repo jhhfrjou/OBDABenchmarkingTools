@@ -27,55 +27,65 @@ def drawGraph(folder,query,subplots):
             if 'loading' in file:
                 if (fileName == 'rdfox.csv'):
                     try:
-                        load[index]=file['loading'].mean()
+                        if(file['loading'].min() != -1):
+                            load[index]=file['loading'].mean()
                     except:
                         print("Errors in loading times in " + folder+'/'+query+'/'+fileName)
                 else:
                     try:
-                        load[index]=file['loading'].mean()/1000000   
+                        if(file['loading'].min() != -1):
+                            load[index]=file['loading'].mean()/1000000   
                     except:
                         print("Errors in loading times in " + folder+'/'+query+'/'+fileName)
 
             if 'block' in file:
                 try:
-                    block[index]=file['block'].mean()/1000000
+                    if(file['block'].min() != -1):
+                        block[index]=file['block'].mean()/1000000
                 except:
                     print("Errors in block times in " + folder+'/'+query+'/'+fileName)
             if 'chase' in file:
                 if (fileName == 'rdfox.csv'):
                     try:
-                        chase[index]=file['chase'].mean()
+                        if(file['chase'].min() != -1):
+                            chase[index]=file['chase'].mean()
                     except:
                         print("Errors in block times in " + folder+'/'+query+'/'+fileName)        
                 else:
                     try:
-                        chase[index]=file['chase'].mean()/1000000
+                        if(file['chase'].min() != -1):
+                            chase[index]=file['chase'].mean()/1000000
                     except:
                         print("Errors in block times in " + folder+'/'+query+'/'+fileName)       
             if 'execute' in file:
                 if (fileName == 'rdfox.csv'):
                     try:
-                        execute[index]=file['execute'].mean()
+                        if(file['execute'].min() != -1):
+                            execute[index]=file['execute'].mean()
                     except:
                         print("Errors in execute times in " + folder+'/'+query+'/'+fileName)
                 else:
                     try:
-                        execute[index]=file['execute'].mean()/1000000
+                        if(file['execute'].min() != -1):
+                            execute[index]=file['execute'].mean()/1000000
                     except:
                         print("Errors in execute times in " + folder+'/'+query+'/'+fileName)            
             if 'rewrite' in file:
                 try:
-                    rewrite[index]=file['rewrite'].mean()/1000000
+                    if(file['rewrite'].min() != -1):
+                        rewrite[index]=file['rewrite'].mean()/1000000
                 except:
                     print("Errors in rewrite times in " + folder+'/'+query+'/'+fileName)        
             if 'convert' in file:
                 try:
-                    convert[index]=file['convert'].mean()/1000000
+                    if(file['convert'].min() != -1):
+                        convert[index]=file['convert'].mean()/1000000
                 except:
                     print("Errors in rewrite times in " + folder+'/'+query+'/'+fileName) 
             if 'gqr' in file:
                 try:
-                    gqr[index]=file['gqr'].mean()/1000000
+                    if(file['gqr'].min() != -1):
+                        gqr[index]=file['gqr'].mean()/1000000
                 except:
                     print("Errors in gqr times in " + folder+'/'+query+'/'+fileName)        
             index=index+1
